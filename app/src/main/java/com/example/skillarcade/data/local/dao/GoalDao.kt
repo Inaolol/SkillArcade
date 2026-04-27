@@ -15,7 +15,7 @@ interface GoalDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(goals: List<GoalEntity>)
 
-    @Query("UPDATE goals SET currentValue = :value, isCompleted = (CASE WHEN :value >= targetValue THEN 1 ELSE 0 END) WHERE id = :goalId")
+    @Query("UPDATE goals SET currentValue = :value, isCompleted = CASE WHEN isCompleted = 1 THEN 1 WHEN :value >= targetValue THEN 1 ELSE 0 END WHERE id = :goalId")
     suspend fun updateProgress(goalId: String, value: Int)
 
     @Query("UPDATE goals SET isCompleted = 1 WHERE id = :goalId")

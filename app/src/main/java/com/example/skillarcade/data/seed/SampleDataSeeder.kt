@@ -16,9 +16,7 @@ import com.example.skillarcade.domain.model.Lesson
 import com.example.skillarcade.domain.model.Rarity
 import com.example.skillarcade.domain.model.Trophy
 import com.example.skillarcade.domain.model.UserProgress
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class SampleDataSeeder(
     private val courseDao: CourseDao,
@@ -30,10 +28,8 @@ class SampleDataSeeder(
 
     override fun onCreate(db: SupportSQLiteDatabase) {
         super.onCreate(db)
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("SampleDataSeeder", "Seeding sample data...")
-            seedData()
-        }
+        Log.d("SampleDataSeeder", "Seeding sample data...")
+        runBlocking { seedData() }
     }
 
     private suspend fun seedData() {

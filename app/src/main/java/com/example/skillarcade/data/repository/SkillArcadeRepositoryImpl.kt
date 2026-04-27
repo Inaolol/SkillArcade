@@ -1,5 +1,7 @@
 package com.example.skillarcade.data.repository
 
+import androidx.room.withTransaction
+import com.example.skillarcade.data.local.SkillArcadeDatabase
 import com.example.skillarcade.data.local.dao.CourseDao
 import com.example.skillarcade.data.local.dao.GoalDao
 import com.example.skillarcade.data.local.dao.LessonDao
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class SkillArcadeRepositoryImpl @Inject constructor(
+    private val db: SkillArcadeDatabase,
     private val courseDao: CourseDao,
     private val lessonDao: LessonDao,
     private val goalDao: GoalDao,
@@ -52,15 +55,17 @@ class SkillArcadeRepositoryImpl @Inject constructor(
             .map { it?.toDomain() ?: UserProgress() }
 
     override suspend fun completeLesson(lessonId: String) {
-        lessonDao.markCompleted(lessonId)
         val lesson = lessonDao.getById(lessonId).first() ?: return
-        courseDao.incrementCompleted(lesson.courseId)
-        userProgressDao.incrementLessonsCompleted(UserProgress.SINGLE_USER_ID)
-        addXp(lesson.xpReward)
-        // Check if course is now fully complete
-        val course = courseDao.getById(lesson.courseId).first()
-        if (course != null && course.completedLessons >= course.totalLessons) {
-            userProgressDao.incrementCoursesCompleted(UserProgress.SINGLE_USER_ID)
+        if (lesson.isCompleted) return  // idempotency guard
+        db.withTransaction {
+            lessonDao.markCompleted(lessonId)
+            courseDao.incrementCompleted(lesson.courseId)
+            userProgressDao.incrementLessonsCompleted(UserProgress.SINGLE_USER_ID)
+            addXp(lesson.xpReward)
+            val course = courseDao.getById(lesson.courseId).first()
+            if (course != null && course.completedLessons >= course.totalLessons) {
+                userProgressDao.incrementCoursesCompleted(UserProgress.SINGLE_USER_ID)
+            }
         }
     }
 
