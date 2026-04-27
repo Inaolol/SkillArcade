@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,15 +47,16 @@ fun BottomNavBar(
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .drawBehind {
+                val strokeWidth = ArcadeTokens.BorderWidth.toPx()
                 drawLine(
                     color = ArcadeColors.InkBlack,
-                    start = Offset(0f, 0f),
-                    end = Offset(size.width, 0f),
-                    strokeWidth = ArcadeTokens.BorderWidth.toPx()
+                    start = Offset(0f, strokeWidth / 2f),
+                    end = Offset(size.width, strokeWidth / 2f),
+                    strokeWidth = strokeWidth
                 )
             }
-            .navigationBarsPadding()
-            .height(64.dp),
+            .height(64.dp)
+            .navigationBarsPadding(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -77,7 +81,12 @@ private fun RowScope.NavTabItem(
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
-            .clickable { onNavigate(tab.route) }
+            .clickable(
+                onClickLabel = tab.label,
+                role = Role.Tab,
+                onClick = { onNavigate(tab.route) }
+            )
+            .semantics { selected = isSelected }
             .background(
                 if (isSelected) ArcadeColors.PrimaryYellow.copy(alpha = 0.15f)
                 else Color.Transparent

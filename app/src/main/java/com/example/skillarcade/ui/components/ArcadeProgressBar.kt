@@ -39,12 +39,12 @@ fun ArcadeProgressBar(
                 shadowOffset = 2.dp,
                 backgroundColor = trackColor
             )
-            .clip(RoundedCornerShape(ArcadeTokens.CornerRadius))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(clampedProgress)
+                .clip(RoundedCornerShape(ArcadeTokens.CornerRadius))
                 .background(color)
         )
     }

@@ -1,5 +1,6 @@
 package com.example.skillarcade.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ fun ArcadeChip(
 ) {
     Box(
         modifier = modifier
+            .background(color = color, shape = RoundedCornerShape(ArcadeTokens.CornerRadius))
             .border(
                 width = ArcadeTokens.BorderWidth,
                 color = ArcadeColors.InkBlack,
