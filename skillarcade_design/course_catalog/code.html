@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SkillArcade Course Catalog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&amp;family=Epilogue:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#705c00",
+                        "surface-tint": "#705d00",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#006c46",
+                        "on-secondary-fixed": "#3f001b",
+                        "primary-fixed": "#ffe174",
+                        "surface-container-low": "#fcf3e0",
+                        "primary-container": "#ffd500",
+                        "secondary-fixed": "#ffd9e1",
+                        "outline-variant": "#d0c6ab",
+                        "on-primary-fixed-variant": "#554500",
+                        "on-background": "#1f1b10",
+                        "tertiary-container": "#32f5a7",
+                        "on-tertiary-fixed-variant": "#005234",
+                        "on-secondary-container": "#6e0035",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#fff8ef",
+                        "surface": "#fff8ef",
+                        "background": "#fff8ef",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#002112",
+                        "on-surface-variant": "#4d4632",
+                        "surface-container": "#f6edda",
+                        "surface-container-highest": "#eae2cf",
+                        "secondary-fixed-dim": "#ffb1c6",
+                        "secondary": "#ac2a5e",
+                        "primary-fixed-dim": "#eac300",
+                        "tertiary": "#006c46",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#fe6b9e",
+                        "on-primary-fixed": "#221b00",
+                        "tertiary-fixed-dim": "#00e297",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#343024",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#e2d9c7",
+                        "inverse-primary": "#eac300",
+                        "on-surface": "#1f1b10",
+                        "inverse-on-surface": "#f9f0dd",
+                        "tertiary-fixed": "#4dffb2",
+                        "on-secondary-fixed-variant": "#8c0a46",
+                        "outline": "#7f775f",
+                        "surface-variant": "#eae2cf",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-high": "#f0e7d5",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#705d00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "xl": "32px",
+                        "margin": "20px"
+                    },
+                    "fontFamily": {
+                        "label-bold": ["Epilogue"],
+                        "label-sm": ["Epilogue"],
+                        "headline-md": ["Clash Display"],
+                        "body-lg": ["Epilogue"],
+                        "display-xl": ["Clash Display"],
+                        "headline-lg": ["Clash Display"],
+                        "body-md": ["Epilogue"]
+                    },
+                    "fontSize": {
+                        "label-bold": ["14px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "500" }],
+                        "display-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Epilogue', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Clash Display', sans-serif; }
+        .brutalist-border { border: 3px solid #1f1b10; }
+        .brutalist-shadow { box-shadow: 4px 4px 0px #121212; }
+        .brutalist-btn-active:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #121212; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center h-16 px-4 w-full sticky top-0 z-50 bg-white dark:bg-zinc-900 docked full-width top-0 border-b-[3px] border-zinc-900 dark:border-zinc-50 shadow-[4px_4px_0px_0px_#121212] hidden md:flex">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-zinc-900 dark:text-zinc-50 cursor-pointer" data-icon="menu">menu</span>
+<span class="text-2xl font-black text-zinc-900 dark:text-zinc-50 font-bold uppercase tracking-tighter">SKILLARCADE</span>
+</div>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-zinc-500 dark:text-zinc-400 font-label-bold text-label-bold uppercase hover:text-zinc-900" href="#">HOME</a>
+<a class="text-zinc-900 dark:text-zinc-50 font-bold font-label-bold text-label-bold uppercase border-b-2 border-zinc-900 pb-1" href="#">LEARN</a>
+<a class="text-zinc-500 dark:text-zinc-400 font-label-bold text-label-bold uppercase hover:text-zinc-900" href="#">GOALS</a>
+<a class="text-zinc-500 dark:text-zinc-400 font-label-bold text-label-bold uppercase hover:text-zinc-900" href="#">ME</a>
+</nav>
+<div class="flex items-center gap-2 brutalist-border rounded-lg px-3 py-1 bg-white cursor-pointer hover:bg-zinc-100 transition-all active:translate-x-[2px] active:translate-y-[2px]">
+<span class="material-symbols-outlined text-[#FFD500]" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-label-bold text-label-bold text-zinc-900">12</span>
+</div>
+</header>
+<!-- Mobile Header (Simplified) -->
+<header class="flex md:hidden justify-between items-center h-16 px-4 w-full sticky top-0 z-50 bg-white border-b-[3px] border-zinc-900 shadow-[4px_4px_0px_0px_#121212]">
+<span class="text-2xl font-black text-zinc-900 font-bold uppercase tracking-tighter">SKILLARCADE</span>
+<div class="flex items-center gap-2 brutalist-border rounded-lg px-2 py-1 bg-white">
+<span class="material-symbols-outlined text-[#FFD500]" data-icon="local_fire_department">local_fire_department</span>
+<span class="font-label-bold text-label-bold">12</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-4 py-8">
+<!-- Sticky Search & Filters -->
+<div class="sticky top-20 md:top-24 z-40 bg-background/95 backdrop-blur-sm pb-6 pt-2">
+<h1 class="font-headline-lg text-headline-lg mb-6 uppercase">Course Catalog</h1>
+<div class="flex flex-col gap-4">
+<!-- Search Bar -->
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">search</span>
+<input class="w-full bg-white brutalist-border rounded-xl py-3 pl-12 pr-4 font-label-bold text-label-bold uppercase text-on-background placeholder:text-on-surface-variant focus:outline-none focus:bg-primary-container focus:ring-0 transition-colors brutalist-shadow" placeholder="SEARCH FOR SKILLS..." type="text"/>
+</div>
+<!-- Filter Pills -->
+<div class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x">
+<button class="snap-start shrink-0 bg-primary-container text-on-primary-container brutalist-border px-4 py-2 rounded-full font-label-bold text-label-bold uppercase brutalist-shadow brutalist-btn-active transition-all">All</button>
+<button class="snap-start shrink-0 bg-white text-on-background brutalist-border px-4 py-2 rounded-full font-label-bold text-label-bold uppercase hover:bg-zinc-100 transition-colors">UI/UX</button>
+<button class="snap-start shrink-0 bg-white text-on-background brutalist-border px-4 py-2 rounded-full font-label-bold text-label-bold uppercase hover:bg-zinc-100 transition-colors">Frontend</button>
+<button class="snap-start shrink-0 bg-white text-on-background brutalist-border px-4 py-2 rounded-full font-label-bold text-label-bold uppercase hover:bg-zinc-100 transition-colors">Marketing</button>
+<button class="snap-start shrink-0 bg-white text-on-background brutalist-border px-4 py-2 rounded-full font-label-bold text-label-bold uppercase hover:bg-zinc-100 transition-colors">Data Science</button>
+</div>
+</div>
+</div>
+<!-- Course Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-6">
+<!-- Card 1 -->
+<article class="bg-white brutalist-border rounded-xl overflow-hidden brutalist-shadow flex flex-col transition-transform hover:-translate-y-1">
+<div class="h-48 bg-[#a3defe] border-b-[3px] border-zinc-900 relative">
+<img alt="Colorful abstract geometric shapes representing ui design concepts" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="Colorful abstract geometric shapes in pop art style representing ui design concepts with bold outlines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq9keDKei08cjbrRvCKZIydRXhslJD_tXPg7ARO-K2LS8P-Iz_KJOIM6q-M5pIytZCdYThj_IgAlZu2IyvrAwNB8RTzAVVXBEdxvGZQzDa8MelvHLchVfG2DPiJybY-TpXjNRM9A2GGHWmgh3WzNV2gw83Cq6Z_7ptYSVmzYLEXMvcI0AFpKWfQotVX3MO6wF4LN5HwXOltlYu2epFOzoNXzB1yyMSo8UUEZhsZKR_hmRMEwEDwJr4RDBpsrS4KTEvZmr1kUwDnow"/>
+<div class="absolute top-4 right-4 bg-tertiary-container text-on-tertiary-container brutalist-border px-2 py-1 rounded font-label-bold text-[10px] uppercase">NEW</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h2 class="font-headline-md text-headline-md mb-2 uppercase">Advanced UI/UX Masterclass</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Master brutalism, neobrutalism, and modern web aesthetics with hands-on projects.</p>
+<div class="mt-auto pt-4 border-t-[3px] border-zinc-900 border-dashed flex justify-between items-center">
+<div class="flex items-center gap-1 font-label-bold text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">schedule</span> 12h
+                        </div>
+<button class="bg-primary-container text-on-primary-container brutalist-border px-4 py-2 rounded-lg font-label-bold text-label-bold uppercase brutalist-shadow brutalist-btn-active transition-all">ENROLL NOW</button>
+</div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-white brutalist-border rounded-xl overflow-hidden brutalist-shadow flex flex-col transition-transform hover:-translate-y-1">
+<div class="h-48 bg-secondary-fixed-dim border-b-[3px] border-zinc-900 relative">
+<img alt="Code on a screen with neon pink lighting" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="Computer screen displaying code with vibrant pink and purple neon lighting in a dark room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcpx1UcVbSly-ak5shxqgL2wdBi6hXfcFsTur2wvgCZW8ZWZ4-znsHHY6wmT6f7NqA7MziARjGvwHUrWlhkzesohcoQ-NmOuT7M6tW6WSOtYzKXltUMZ6u8WMSClSJDH_Uqz5sNympu0L9cLZhlxOBI1ioqINMOyzAuSkIFodcFZ-VvNnIdpeNiuFWKzN5BrckaIY8UaaAyvkPxS5TAiImbHQsN_jY7aFxk-9ZRdFvEUtx0oltPqRT618_dAnJ0DoACQvGPXvFdvU"/>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h2 class="font-headline-md text-headline-md mb-2 uppercase">React &amp; Tailwind Bootcamp</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Build fast, responsive, and beautiful web applications from scratch.</p>
+<div class="mt-auto pt-4 border-t-[3px] border-zinc-900 border-dashed flex justify-between items-center">
+<div class="flex items-center gap-1 font-label-bold text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">schedule</span> 24h
+                        </div>
+<button class="bg-primary-container text-on-primary-container brutalist-border px-4 py-2 rounded-lg font-label-bold text-label-bold uppercase brutalist-shadow brutalist-btn-active transition-all">ENROLL NOW</button>
+</div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-white brutalist-border rounded-xl overflow-hidden brutalist-shadow flex flex-col transition-transform hover:-translate-y-1">
+<div class="h-48 bg-tertiary-fixed border-b-[3px] border-zinc-900 relative">
+<img alt="Megaphone with pop art dot pattern background" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="Retro megaphone illustration with comic book style halftone dot pattern background in bright green" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDea3CzlQBpo56Z7ZMhm_nd4ePqy7zg5z7Ar2RgbPltx548nj6nRLzf54HiHiq9-CnSNDMI_6WFvIkEcl_E07Z_AzeQAEr6g7q6e2Z3lzI8pPQFZ-woVS20_3jGemHkc8pMQKMHiMuQz69FLpvVeFIl5bCUY3Z4bBy81XUKwhc797aqJouPydEcd_whPd2cVEiuhv5MbdziCZBeywx6n0EjSlhQzBU2GyLQpJx7WxTZRBn82OHI_LqrmOUqhMa5OKnpE-1x5KFYXnQ"/>
+<div class="absolute top-4 right-4 bg-primary-container text-on-primary-container brutalist-border px-2 py-1 rounded font-label-bold text-[10px] uppercase">POPULAR</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h2 class="font-headline-md text-headline-md mb-2 uppercase">Guerilla Marketing Tactics</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 line-clamp-2">Unconventional strategies to grab attention and drive massive growth.</p>
+<div class="mt-auto pt-4 border-t-[3px] border-zinc-900 border-dashed flex justify-between items-center">
+<div class="flex items-center gap-1 font-label-bold text-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-sm">schedule</span> 8h
+                        </div>
+<button class="bg-primary-container text-on-primary-container brutalist-border px-4 py-2 rounded-lg font-label-bold text-label-bold uppercase brutalist-shadow brutalist-btn-active transition-all">ENROLL NOW</button>
+</div>
+</div>
+</article>
+</div>
+<!-- Load More (Infinite Scroll Indicator) -->
+<div class="mt-12 flex justify-center">
+<button class="bg-white text-on-background brutalist-border px-6 py-3 rounded-xl font-headline-md text-headline-md uppercase brutalist-shadow brutalist-btn-active transition-all flex items-center gap-2">
+                 LOAD MORE <span class="material-symbols-outlined">autorenew</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe bg-white dark:bg-zinc-900 docked full-width bottom-0 border-t-[3px] border-zinc-900 dark:border-zinc-50 h-20 shadow-[0px_-4px_0px_0px_#121212]">
+<a class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 p-2 hover:text-zinc-900 dark:hover:text-zinc-50 active:translate-x-[2px] active:translate-y-[2px] transition-all" href="#">
+<span class="material-symbols-outlined text-xl font-black" data-icon="home">home</span>
+<span class="font-bold uppercase text-[10px] tracking-widest mt-1">HOME</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#FFD500] text-zinc-900 border-[3px] border-zinc-900 rounded-lg px-4 py-1 shadow-[2px_2px_0px_0px_#121212] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all" href="#">
+<span class="material-symbols-outlined text-xl font-black" data-icon="school">school</span>
+<span class="font-bold uppercase text-[10px] tracking-widest mt-1">LEARN</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 p-2 hover:text-zinc-900 dark:hover:text-zinc-50 active:translate-x-[2px] active:translate-y-[2px] transition-all" href="#">
+<span class="material-symbols-outlined text-xl font-black" data-icon="emoji_events">emoji_events</span>
+<span class="font-bold uppercase text-[10px] tracking-widest mt-1">GOALS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 dark:text-zinc-400 p-2 hover:text-zinc-900 dark:hover:text-zinc-50 active:translate-x-[2px] active:translate-y-[2px] transition-all" href="#">
+<span class="material-symbols-outlined text-xl font-black" data-icon="person">person</span>
+<span class="font-bold uppercase text-[10px] tracking-widest mt-1">ME</span>
+</a>
+</nav>
+</body></html>
