@@ -4,7 +4,7 @@ data class Trophy(
     val id: String,
     val title: String,
     val description: String,
-    val iconResName: String,
+    val iconKey: String,
     val isUnlocked: Boolean = false,
     val unlockedAt: Long? = null,
     val rarity: Rarity

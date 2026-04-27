@@ -83,103 +83,36 @@ Do not add:
 
 The user already set up the repo with basic structure .
 
-
-```text
-.
-├── .gitignore
-├── .gradle
-│   ├── 9.4.1
-│   ├── buildOutputCleanup
-│   ├── file-system.probe
-│   └── vcs-1
-├── .idea
-│   ├── .gitignore
-│   ├── AndroidProjectSystem.xml
-│   ├── caches
-│   ├── compiler.xml
-│   ├── deploymentTargetSelector.xml
-│   ├── gradle.xml
-│   ├── inspectionProfiles
-│   ├── misc.xml
-│   ├── runConfigurations.xml
-│   └── workspace.xml
-├── .kotlin
-│   └── sessions
-├── app
-│   ├── .gitignore
-│   ├── build
-│   ├── build.gradle.kts
-│   ├── proguard-rules.pro
-│   └── src
-├── build.gradle.kts
-├── gradle
-│   ├── gradle-daemon-jvm.properties
-│   ├── libs.versions.toml
-│   └── wrapper
-├── gradle.properties
-├── gradlew
-├── gradlew.bat
-├── local.properties
-├── settings.gradle.kts
-└── skillarcade_design
-    ├── course_catalog
-    ├── course_progress
-    ├── DESIGN.md
-    ├── goals_screen
-    ├── home_dashboard
-    ├── lesson_player
-    ├── onboarding_slide_1
-    ├── onboarding_slide_2
-    ├── onboarding_slide_3
-    ├── onboarding_slide_4
-    ├── splash_screen
-    └── trophy_room
-```
-
 I already Run the empty app once.
 
-Recommended Kotlin package structure:
+Actual Kotlin package structure (as built):
 
 ```text
 app/src/main/java/com/example/skillarcade/
 ├── MainActivity.kt
+├── SkillArcadeApplication.kt
 ├── data/
-│   ├── model/
-│   │   ├── Course.kt
-│   │   ├── Lesson.kt
-│   │   ├── Goal.kt
-│   │   ├── Trophy.kt
-│   │   └── UserProgress.kt
+│   └── local/
+│       ├── SkillArcadeDatabase.kt
+│       ├── entities/          (Room @Entity classes)
+│       ├── dao/               (Room @Dao interfaces)
+│       ├── Mappers.kt
+│       └── seed/
+│           └── SampleDataSeeder.kt
 │   └── repository/
-│       └── SkillArcadeRepository.kt
+│       └── SkillArcadeRepositoryImpl.kt
+├── di/
+│   ├── DatabaseModule.kt
+│   └── RepositoryModule.kt
 ├── domain/
-│   ├── ProgressCalculator.kt
-│   └── GoalEvaluator.kt
+│   ├── model/                 (Course, Lesson, Goal, Trophy, UserProgress + enums)
+│   ├── repository/            (SkillArcadeRepository interface)
+│   └── usecase/               (ProgressCalculator, GoalEvaluator)
 ├── ui/
-│   ├── navigation/
-│   │   ├── AppRoute.kt
-│   │   └── SkillArcadeNavHost.kt
-│   ├── screens/
-│   │   ├── SplashScreen.kt
-│   │   ├── OnboardingScreen.kt
-│   │   ├── HomeDashboardScreen.kt
-│   │   ├── CourseCatalogScreen.kt
-│   │   ├── CourseProgressScreen.kt
-│   │   ├── LessonPlayerScreen.kt
-│   │   ├── GoalsScreen.kt
-│   │   └── TrophyRoomScreen.kt
+│   ├── theme/
 │   ├── components/
-│   │   ├── ArcadeButton.kt
-│   │   ├── ArcadeCard.kt
-│   │   ├── ArcadeProgressBar.kt
-│   │   ├── BottomNavBar.kt
-│   │   ├── CourseCard.kt
-│   │   ├── GoalCard.kt
-│   │   └── TrophyCard.kt
-│   └── theme/
-│       ├── Color.kt
-│       ├── Theme.kt
-│       └── Type.kt
+│   ├── navigation/
+│   └── screens/
 ```
 
 ## 5. Design Alignment Rules
