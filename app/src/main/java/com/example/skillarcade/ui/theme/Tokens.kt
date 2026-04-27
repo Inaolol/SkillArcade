@@ -1,13 +1,13 @@
 package com.example.skillarcade.ui.theme
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -38,13 +38,13 @@ object ArcadeTokens {
  */
 fun Modifier.arcadeBorderShadow(
     cornerRadius: Dp = ArcadeTokens.CornerRadius,
-    shadowColor: Color = ArcadeColors.InkBlack,
+    shadowColor: Color = ArcadeTokens.BorderColor,
     shadowOffset: Dp = ArcadeTokens.ShadowOffset,
     borderWidth: Dp = ArcadeTokens.BorderWidth,
-    borderColor: Color = ArcadeColors.InkBlack,
+    borderColor: Color = ArcadeTokens.BorderColor,
     backgroundColor: Color = Color.Transparent
 ): Modifier = this
-    .offset(x = 0.dp, y = 0.dp)
+    .graphicsLayer { clip = false }
     .drawBehind {
         val shadowPx = shadowOffset.toPx()
         val cornerPx = cornerRadius.toPx()

@@ -42,14 +42,14 @@ val SkillArcadeTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 48.sp,
         lineHeight = (48 * 1.1).sp,   // lineHeight: 1.1
-        letterSpacing = (48 * 0.02).sp // letterSpacing: 0.02em
+        letterSpacing = 0.96.sp // letterSpacing: 0.02em
     ),
     headlineLarge = TextStyle(
         fontFamily = ClashDisplay,
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         lineHeight = (32 * 1.2).sp,
-        letterSpacing = (32 * 0.02).sp
+        letterSpacing = 0.64.sp
     ),
     headlineMedium = TextStyle(
         fontFamily = ClashDisplay,
