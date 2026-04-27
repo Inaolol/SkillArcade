@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.example.skillarcade.ui.navigation.SkillArcadeNavHost
 import com.example.skillarcade.ui.theme.SkillArcadeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,12 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SkillArcadeTheme {
-                // SkillArcadeNavHost will be wired here in Task H
-                // Placeholder to keep the app launchable now:
-                androidx.compose.material3.Text(
-                    text = "SkillArcade Loading...",
-                    modifier = androidx.compose.ui.Modifier
-                )
+                SkillArcadeNavHost()
             }
         }
     }
