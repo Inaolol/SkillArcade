@@ -53,11 +53,14 @@ class SkillArcadeRepositoryImpl @Inject constructor(
 
     override suspend fun completeLesson(lessonId: String) {
         lessonDao.markCompleted(lessonId)
-        val lesson = lessonDao.getById(lessonId).first()
-        lesson?.let {
-            courseDao.incrementCompleted(it.courseId)
-            userProgressDao.incrementLessonsCompleted(UserProgress.SINGLE_USER_ID)
-            addXp(it.xpReward)
+        val lesson = lessonDao.getById(lessonId).first() ?: return
+        courseDao.incrementCompleted(lesson.courseId)
+        userProgressDao.incrementLessonsCompleted(UserProgress.SINGLE_USER_ID)
+        addXp(lesson.xpReward)
+        // Check if course is now fully complete
+        val course = courseDao.getById(lesson.courseId).first()
+        if (course != null && course.completedLessons >= course.totalLessons) {
+            userProgressDao.incrementCoursesCompleted(UserProgress.SINGLE_USER_ID)
         }
     }
 
