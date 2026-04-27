@@ -26,9 +26,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): SkillArcadeDatabase {
-        // roomDb is captured by the callback before assignment completes.
-        // Room guarantees onCreate fires only after the DB file is created and
-        // the RoomDatabase instance is fully built, so roomDb is non-null by then.
+        // `roomDb` is assigned synchronously by `build()` before Room opens the DB file.
+        // Room defers the first open to a background thread, so `onCreate` always fires
+        // after the assignment completes — making the var-capture safe on Android's JVM.
         var roomDb: SkillArcadeDatabase? = null
         roomDb = Room.databaseBuilder(
             context,
@@ -55,17 +55,22 @@ object DatabaseModule {
     }
 
     @Provides
+    @Singleton
     fun provideCourseDao(db: SkillArcadeDatabase): CourseDao = db.courseDao()
 
     @Provides
+    @Singleton
     fun provideLessonDao(db: SkillArcadeDatabase): LessonDao = db.lessonDao()
 
     @Provides
+    @Singleton
     fun provideGoalDao(db: SkillArcadeDatabase): GoalDao = db.goalDao()
 
     @Provides
+    @Singleton
     fun provideTrophyDao(db: SkillArcadeDatabase): TrophyDao = db.trophyDao()
 
     @Provides
+    @Singleton
     fun provideUserProgressDao(db: SkillArcadeDatabase): UserProgressDao = db.userProgressDao()
 }
