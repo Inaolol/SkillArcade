@@ -79,10 +79,14 @@ fun SkillArcadeNavHost(
             }
         }
         composable<AppRoute.Goals> {
-            MainScaffold(navController) { GoalsScreen() }
+            MainScaffold(navController) {
+                GoalsScreen(onNavigateToCourses = { navController.navigate(AppRoute.CourseCatalog) })
+            }
         }
         composable<AppRoute.TrophyRoom> {
-            MainScaffold(navController) { TrophyRoomScreen() }
+            MainScaffold(navController) {
+                TrophyRoomScreen(onNavigateToHome = { navController.navigate(AppRoute.Home) })
+            }
         }
     }
 }
