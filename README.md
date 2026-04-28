@@ -1,6 +1,10 @@
 <p align="center">
-  <b>SkillArcade: Gamify Your Growth</b><br>
-  <i>Turning the educational grind into a high-score quest.</i>
+  <img
+    src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=26&duration=2800&pause=800&color=A855F7&center=true&vCenter=true&width=800&lines=SkillArcade%3A+Gamify+Your+Growth;Quests%2C+XP%2C+and+Trophies"
+    />
+  <br/>
+  <b/>SkillArcade</b><br>
+  <i>Gamify Your Growth.</i>
 </p>
 
 <p align="center">
