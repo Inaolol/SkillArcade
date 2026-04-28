@@ -138,91 +138,48 @@ private fun YouTubePlayerCard(lesson: Lesson) {
                             settings.domStorageEnabled = true
                             settings.mediaPlaybackRequiresUserGesture = false
                             settings.loadsImagesAutomatically = true
-                            settings.loadWithOverviewMode = true
-                            settings.useWideViewPort = true
-                            settings.setSupportMultipleWindows(false)
+                            settings.userAgentString = "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
                             webChromeClient = WebChromeClient()
                         }
                     },
                     update = { webView ->
                         webView.webViewClient = object : WebViewClient() {
-                            override fun onPageStarted(
-                                view: WebView?,
-                                url: String?,
-                                favicon: android.graphics.Bitmap?
-                            ) {
+                            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                                 isLoading = true
                                 hasError = false
                             }
 
                             override fun onPageFinished(view: WebView?, url: String?) {
-                                view?.setBackgroundColor(android.graphics.Color.BLACK)
+                                isLoading = false
                             }
 
-                            override fun onReceivedError(
-                                view: WebView?,
-                                request: WebResourceRequest?,
-                                error: WebResourceError?
-                            ) {
+                            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
                                 if (request?.isForMainFrame != false) {
                                     isLoading = false
                                     hasError = true
                                 }
                             }
 
-                            override fun onReceivedHttpError(
-                                view: WebView?,
-                                request: WebResourceRequest?,
-                                errorResponse: WebResourceResponse?
-                            ) {
-                                if (request?.isForMainFrame == true) {
-                                    isLoading = false
-                                    hasError = true
-                                }
-                            }
-
-                            override fun shouldOverrideUrlLoading(
-                                view: WebView?,
-                                request: WebResourceRequest?
-                            ): Boolean {
+                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                 val url = request?.url ?: return false
-                                if (url.scheme == "skillarcade") {
-                                    when (url.host) {
-                                        "player-ready" -> {
-                                            isLoading = false
-                                            hasError = false
-                                        }
-                                        "player-error" -> {
-                                            isLoading = false
-                                            hasError = true
-                                        }
+                                
+                                if (request?.isForMainFrame == true) {
+                                    val host = url.host.orEmpty()
+                                    val canStay = host.endsWith("youtube.com") || 
+                                                 host.endsWith("youtube-nocookie.com")
+                                    
+                                    if (!canStay) {
+                                        openExternalUrl(context, url.toString())
+                                        return true
                                     }
-                                    return true
                                 }
-
-                                val host = url.host.orEmpty()
-                                val canStayInPlayer = host.endsWith("youtube.com") ||
-                                    host.endsWith("youtube-nocookie.com") ||
-                                    host.endsWith("googlevideo.com") ||
-                                    host.endsWith("ytimg.com") ||
-                                    host.endsWith("google.com") ||
-                                    host.endsWith("skillarcade.local")
-
-                                if (canStayInPlayer) return false
-                                openExternalUrl(context, url.toString())
-                                return true
+                                return false
                             }
                         }
 
                         if (webView.tag != playerHtml) {
                             webView.tag = playerHtml
-                            webView.loadDataWithBaseURL(
-                                YOUTUBE_PLAYER_BASE_URL,
-                                playerHtml,
-                                "text/html",
-                                "UTF-8",
-                                null
-                            )
+                            webView.loadDataWithBaseURL(YOUTUBE_PLAYER_BASE_URL, playerHtml!!, "text/html", "UTF-8", null)
                         }
                     },
                     modifier = Modifier.fillMaxSize()

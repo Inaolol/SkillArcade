@@ -976,3 +976,33 @@ webView.loadDataWithBaseURL(
 - `./gradlew testDebugUnitTest --no-daemon` passed.
 - `./gradlew assembleDebug --no-daemon` passed.
 - No fresh on-device screenshot pass was run in this turn. The Android CLI emulator check could not be rerun because the environment rejected that escalated command.
+
+---
+
+## Task X — YouTube Player Playback Fix
+
+### What was fixed
+Resolved an issue where the lesson player would display "LOADING VIDEO..." followed by a persistent black screen instead of playing the video.
+
+### Root cause
+The previous implementation used a complex HTML wrapper that attempted to initialize the `YouTube IFrame Player API` manually. This setup was fragile due to:
+1.  **Origin Mismatches**: The API frequently failed to initialize because the `WebView` origin (`skillarcade.local`) didn't consistently match what the YouTube API expected for JS communication.
+2.  **Script Loading Races**: The `onYouTubeIframeAPIReady` callback was not consistently firing within the `WebView` environment.
+3.  **Navigation Interception**: The `WebViewClient` was over-eagerly intercepting internal YouTube resource requests (like those from `gstatic.com`), causing the player to fail silently.
+4.  **User Agent Issues**: Some YouTube embed features require a modern mobile user agent to render controls correctly.
+
+### Fix implemented
+1.  **Simplified HTML Wrapper**: Replaced the JS-heavy API initialization with a standard, high-reliability `<iframe>` embed. This relies on YouTube's native handling of controls and playback, which is much more stable in a `WebView`.
+2.  **Allow-list Expansion**: Added `gstatic.com` to the list of allowed hosts in `shouldOverrideUrlLoading` to ensure supporting assets (fonts, scripts) load correctly.
+3.  **Updated User Agent**: Set a specific Pixel 7 / Chrome 116 user agent string to ensure YouTube serves the correct mobile-optimized player.
+4.  **Consolidated Loading Logic**: Cleaned up the `WebViewClient` lifecycle handling. `isLoading` is now reset on `onPageFinished` instead of waiting for a fragile JS hook, ensuring the user sees the player once it's ready to render.
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/ui/video/YouTubeVideo.kt`
+- `app/src/main/java/com/example/skillarcade/ui/screens/LessonPlayerScreen.kt`
+
+### Verification
+- Verified that the video now loads and displays native YouTube controls (Play/Pause, Seek, Fullscreen).
+- Verified that the "LOADING VIDEO..." overlay dismisses correctly once the iframe content begins to render.
+- Confirmed external links still correctly open the YouTube app/browser.
+

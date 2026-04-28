@@ -3,9 +3,8 @@ package com.example.skillarcade.ui.video
 import java.net.URI
 import java.net.URLDecoder
 
-const val YOUTUBE_PLAYER_BASE_URL = "https://skillarcade.local/"
+const val YOUTUBE_PLAYER_BASE_URL = "https://skillarcade.local"
 
-private const val YOUTUBE_PLAYER_ORIGIN = "https://skillarcade.local"
 private const val YOUTUBE_PLAYER_ORIGIN_QUERY = "https%3A%2F%2Fskillarcade.local"
 
 fun extractYouTubeVideoId(youtubeUrl: String): String? {
@@ -27,58 +26,20 @@ fun extractYouTubeVideoId(youtubeUrl: String): String? {
 }
 
 fun buildYouTubeEmbedUrl(videoId: String): String =
-    "https://www.youtube.com/embed/$videoId?playsinline=1&rel=0&enablejsapi=1&origin=$YOUTUBE_PLAYER_ORIGIN_QUERY"
+    "https://www.youtube.com/embed/$videoId?playsinline=1&rel=0&enablejsapi=1&origin=$YOUTUBE_PLAYER_ORIGIN_QUERY&widgetid=1"
 
 fun buildYouTubePlayerHtml(videoId: String): String {
-    val embedUrl = buildYouTubeEmbedUrl(videoId)
     return """
-        <!doctype html>
+        <!DOCTYPE html>
         <html>
-            <head>
-                <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-                <style>
-                    html, body {
-                        margin: 0;
-                        padding: 0;
-                        width: 100%;
-                        height: 100%;
-                        overflow: hidden;
-                        background: #000000;
-                    }
-                    iframe {
-                        position: absolute;
-                        inset: 0;
-                        width: 100%;
-                        height: 100%;
-                        border: 0;
-                        background: #000000;
-                    }
-                </style>
-            </head>
-            <body>
-                <iframe
-                    id="skillarcade-player"
-                    src="$embedUrl"
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen>
-                </iframe>
-                <script src="https://www.youtube.com/iframe_api"></script>
-                <script>
-                    function onYouTubeIframeAPIReady() {
-                        new YT.Player('skillarcade-player', {
-                            events: {
-                                'onReady': function() {
-                                    window.location.href = 'skillarcade://player-ready';
-                                },
-                                'onError': function(event) {
-                                    window.location.href = 'skillarcade://player-error?code=' + event.data;
-                                }
-                            }
-                        });
-                    }
-                </script>
-            </body>
+        <body style="margin:0;padding:0;background:#000;">
+            <iframe width="100%" height="100%" 
+                src="https://www.youtube.com/embed/$videoId?playsinline=1&controls=1" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+            </iframe>
+        </body>
         </html>
     """.trimIndent()
 }
