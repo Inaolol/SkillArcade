@@ -34,14 +34,30 @@ object DatabaseModule {
             context,
             SkillArcadeDatabase::class.java,
             "skillarcade.db"
-        ).addCallback(object : RoomDatabase.Callback() {
+        ).fallbackToDestructiveMigration()
+            .addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                // roomDb is guaranteed to be set before Room calls onCreate
-                val database = checkNotNull(roomDb) {
-                    "Database instance was null during seeder callback"
+                val database = checkNotNull(roomDb) { "Database instance null in onCreate" }
+                Log.d("DatabaseModule", "DB created; seeding...")
+                seed(db, database)
+            }
+
+            override fun onOpen(db: SupportSQLiteDatabase) {
+                super.onOpen(db)
+                // If courses table is empty (e.g. onCreate was missed on existing DB), seed now
+                val cursor = db.query("SELECT COUNT(*) FROM courses")
+                cursor.moveToFirst()
+                val count = cursor.getInt(0)
+                cursor.close()
+                if (count == 0) {
+                    val database = checkNotNull(roomDb) { "Database instance null in onOpen" }
+                    Log.d("DatabaseModule", "DB empty on open; seeding...")
+                    seed(db, database)
                 }
-                Log.d("DatabaseModule", "Database created; delegating to SampleDataSeeder")
+            }
+
+            private fun seed(db: SupportSQLiteDatabase, database: SkillArcadeDatabase) {
                 SampleDataSeeder(
                     courseDao = database.courseDao(),
                     lessonDao = database.lessonDao(),

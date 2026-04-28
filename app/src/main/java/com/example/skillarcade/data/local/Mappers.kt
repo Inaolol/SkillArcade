@@ -17,7 +17,7 @@ import com.example.skillarcade.domain.model.UserProgress
 // Entity → Domain
 fun CourseEntity.toDomain(): Course = Course(
     id, title, description, category, totalLessons, completedLessons, xpReward,
-    Difficulty.valueOf(difficulty), thumbnailUrl
+    Difficulty.valueOf(difficulty), thumbnailUrl, durationHours, tag
 )
 
 fun LessonEntity.toDomain(): Lesson = Lesson(
@@ -38,7 +38,7 @@ fun UserProgressEntity.toDomain(): UserProgress = UserProgress(
 
 // Domain → Entity (for seeding)
 fun Course.toEntity(): CourseEntity = CourseEntity(
-    id, title, description, category, totalLessons, completedLessons, xpReward, difficulty.name, thumbnailUrl
+    id, title, description, category, totalLessons, completedLessons, xpReward, difficulty.name, thumbnailUrl, durationHours, tag
 )
 
 fun Lesson.toEntity(): LessonEntity = LessonEntity(

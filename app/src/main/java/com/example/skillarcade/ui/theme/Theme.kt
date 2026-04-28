@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 
 @Composable
 fun SkillArcadeTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) skillArcadeDarkColors else skillArcadeLightColors
