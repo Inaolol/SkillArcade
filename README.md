@@ -8,12 +8,6 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> •
-  <a href="docs/translations/README_ES.md">Español</a> •
-  <a href="docs/translations/README_FR.md">Français</a>
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/Kotlin-2.2.10-purple?logo=kotlin" alt="Kotlin" />
   <img src="https://img.shields.io/badge/Compose-2026.02.01-green?logo=jetpackcompose" alt="Compose" />
   <img src="https://img.shields.io/badge/Hilt-2.59.2-blue?logo=dagger" alt="Hilt" />
