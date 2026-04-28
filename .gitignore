@@ -28,6 +28,7 @@ skillarcade_design/
 docs/*
 !docs/architecture/
 !docs/architecture/**
+docs/architecture/implementation-log.md
 
 # Local IDE metadata
 .idea/
