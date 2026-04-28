@@ -166,7 +166,9 @@ private fun YouTubePlayerCard(lesson: Lesson) {
                                 if (request?.isForMainFrame == true) {
                                     val host = url.host.orEmpty()
                                     val canStay = host.endsWith("youtube.com") || 
-                                                 host.endsWith("youtube-nocookie.com")
+                                                 host.endsWith("youtube-nocookie.com") ||
+                                                 host.endsWith("gstatic.com") ||
+                                                 host.endsWith("googlevideo.com")
                                     
                                     if (!canStay) {
                                         openExternalUrl(context, url.toString())
