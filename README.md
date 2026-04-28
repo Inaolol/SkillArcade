@@ -53,7 +53,7 @@ Follow these steps to deploy the arcade environment to your local machine:
    git clone https://github.com/Inaolol/SkillArcade.git
    ```
 2. **Open in Android Studio:**
-   Ensure you are using Android Studio Ladybug (or newer) to support AGP **9.2.0**.
+   Use an Android Studio version that supports the project AGP version (**9.0.0**). If sync fails on an older IDE, see [`gradle/libs.versions.toml`](gradle/libs.versions.toml) and set `agp` to a version supported by that Android Studio installation.
 3. **Sync Gradle:**
    Allow the IDE to download dependencies defined in `libs.versions.toml`.
 4. **Run Build:**
