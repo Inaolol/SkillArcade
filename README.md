@@ -70,7 +70,7 @@ Follow these steps to deploy the arcade environment to your local machine:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/user/SkillArcade.git
+   git clone https://github.com/Inaolol/SkillArcade.git
    ```
 2. **Open in Android Studio:**
    Ensure you are using Android Studio Ladybug (or newer) to support AGP **9.2.0**.
