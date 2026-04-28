@@ -12,6 +12,9 @@ interface GoalDao {
     @Query("SELECT * FROM goals")
     fun getAll(): Flow<List<GoalEntity>>
 
+    @Query("SELECT COUNT(*) FROM goals")
+    suspend fun countGoals(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(goals: List<GoalEntity>)
 

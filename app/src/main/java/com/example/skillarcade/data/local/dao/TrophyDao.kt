@@ -12,6 +12,9 @@ interface TrophyDao {
     @Query("SELECT * FROM trophies")
     fun getAll(): Flow<List<TrophyEntity>>
 
+    @Query("SELECT COUNT(*) FROM trophies")
+    suspend fun countTrophies(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(trophies: List<TrophyEntity>)
 

@@ -21,7 +21,7 @@ import com.example.skillarcade.data.local.entities.UserProgressEntity
         TrophyEntity::class,
         UserProgressEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 abstract class SkillArcadeDatabase : RoomDatabase() {

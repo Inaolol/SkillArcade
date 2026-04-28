@@ -1,7 +1,14 @@
 package com.example.skillarcade.ui.screens
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebChromeClient
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,11 +24,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,8 +46,12 @@ import com.example.skillarcade.ui.components.ArcadeChip
 import com.example.skillarcade.ui.theme.ArcadeColors
 import com.example.skillarcade.ui.theme.ArcadeTokens
 import com.example.skillarcade.ui.theme.arcadeBorderShadow
+import com.example.skillarcade.ui.video.YOUTUBE_PLAYER_BASE_URL
+import com.example.skillarcade.ui.video.buildYouTubePlayerHtml
+import com.example.skillarcade.ui.video.extractYouTubeVideoId
 import com.example.skillarcade.ui.viewmodel.LessonPlayerViewModel
 import androidx.compose.foundation.shape.RoundedCornerShape
+import kotlinx.coroutines.delay
 
 @Composable
 fun LessonPlayerScreen(lessonId: String, onBack: () -> Unit) {
@@ -79,12 +95,23 @@ private fun BackButtonRow(onBack: () -> Unit) {
     }
 }
 
-private fun extractVideoId(youtubeUrl: String): String =
-    youtubeUrl.substringAfter("v=").substringBefore("&")
-
 @Composable
 private fun YouTubePlayerCard(lesson: Lesson) {
-    val videoId = extractVideoId(lesson.youtubeUrl)
+    val context = LocalContext.current
+    val videoId = remember(lesson.youtubeUrl) { extractYouTubeVideoId(lesson.youtubeUrl) }
+    val playerHtml = remember(videoId) { videoId?.let(::buildYouTubePlayerHtml) }
+    var isLoading by remember(playerHtml) { mutableStateOf(playerHtml != null) }
+    var hasError by remember(playerHtml) { mutableStateOf(playerHtml == null) }
+
+    LaunchedEffect(playerHtml) {
+        if (playerHtml != null) {
+            delay(10_000)
+            if (isLoading && !hasError) {
+                isLoading = false
+                hasError = true
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -102,26 +129,120 @@ private fun YouTubePlayerCard(lesson: Lesson) {
                 .clip(RoundedCornerShape(ArcadeTokens.CornerRadius))
                 .background(ArcadeColors.InkBlack)
         ) {
-            if (videoId.isNotBlank()) {
+            if (playerHtml != null) {
                 AndroidView(
                     factory = { ctx ->
                         WebView(ctx).apply {
+                            setBackgroundColor(android.graphics.Color.BLACK)
                             settings.javaScriptEnabled = true
                             settings.domStorageEnabled = true
                             settings.mediaPlaybackRequiresUserGesture = false
+                            settings.loadsImagesAutomatically = true
+                            settings.loadWithOverviewMode = true
+                            settings.useWideViewPort = true
+                            settings.setSupportMultipleWindows(false)
                             webChromeClient = WebChromeClient()
-                            loadUrl("https://www.youtube.com/embed/$videoId")
+                        }
+                    },
+                    update = { webView ->
+                        webView.webViewClient = object : WebViewClient() {
+                            override fun onPageStarted(
+                                view: WebView?,
+                                url: String?,
+                                favicon: android.graphics.Bitmap?
+                            ) {
+                                isLoading = true
+                                hasError = false
+                            }
+
+                            override fun onPageFinished(view: WebView?, url: String?) {
+                                view?.setBackgroundColor(android.graphics.Color.BLACK)
+                            }
+
+                            override fun onReceivedError(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                                error: WebResourceError?
+                            ) {
+                                if (request?.isForMainFrame != false) {
+                                    isLoading = false
+                                    hasError = true
+                                }
+                            }
+
+                            override fun onReceivedHttpError(
+                                view: WebView?,
+                                request: WebResourceRequest?,
+                                errorResponse: WebResourceResponse?
+                            ) {
+                                if (request?.isForMainFrame == true) {
+                                    isLoading = false
+                                    hasError = true
+                                }
+                            }
+
+                            override fun shouldOverrideUrlLoading(
+                                view: WebView?,
+                                request: WebResourceRequest?
+                            ): Boolean {
+                                val url = request?.url ?: return false
+                                if (url.scheme == "skillarcade") {
+                                    when (url.host) {
+                                        "player-ready" -> {
+                                            isLoading = false
+                                            hasError = false
+                                        }
+                                        "player-error" -> {
+                                            isLoading = false
+                                            hasError = true
+                                        }
+                                    }
+                                    return true
+                                }
+
+                                val host = url.host.orEmpty()
+                                val canStayInPlayer = host.endsWith("youtube.com") ||
+                                    host.endsWith("youtube-nocookie.com") ||
+                                    host.endsWith("googlevideo.com") ||
+                                    host.endsWith("ytimg.com") ||
+                                    host.endsWith("google.com") ||
+                                    host.endsWith("skillarcade.local")
+
+                                if (canStayInPlayer) return false
+                                openExternalUrl(context, url.toString())
+                                return true
+                            }
+                        }
+
+                        if (webView.tag != playerHtml) {
+                            webView.tag = playerHtml
+                            webView.loadDataWithBaseURL(
+                                YOUTUBE_PLAYER_BASE_URL,
+                                playerHtml,
+                                "text/html",
+                                "UTF-8",
+                                null
+                            )
                         }
                     },
                     modifier = Modifier.fillMaxSize()
                 )
-            } else {
+            }
+
+            if (isLoading) {
                 Text(
-                    text = "▶",
+                    text = "LOADING VIDEO...",
                     modifier = Modifier.align(Alignment.Center),
-                    style = MaterialTheme.typography.displayLarge,
+                    style = MaterialTheme.typography.labelLarge,
                     color = Color.White,
                     textAlign = TextAlign.Center
+                )
+            }
+
+            if (hasError) {
+                VideoFallback(
+                    onOpenExternal = { openExternalUrl(context, lesson.youtubeUrl) },
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
         }
@@ -134,6 +255,34 @@ private fun YouTubePlayerCard(lesson: Lesson) {
                 .padding(8.dp)
         )
     }
+}
+
+@Composable
+private fun VideoFallback(
+    onOpenExternal: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "VIDEO UNAVAILABLE",
+            style = MaterialTheme.typography.labelLarge,
+            color = Color.White,
+            textAlign = TextAlign.Center
+        )
+        ArcadeButton(
+            text = "OPEN IN YOUTUBE",
+            onClick = onOpenExternal
+        )
+    }
+}
+
+private fun openExternalUrl(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    runCatching { context.startActivity(intent) }
 }
 
 @Composable

@@ -693,3 +693,286 @@ The video ID is extracted from the `youtubeUrl` already stored per lesson in `Sa
 - Course Catalog: 0 COURSES / "No filtered courses yet" empty state (before seed fix)
 - Goals: 0 DAY STREAK, 0/0 DONE, 0 XP, "No quests today" (before seed fix)
 - BottomNavBar: new arcade card active tab with emoji icons (after redesign)
+
+---
+
+## Task S — Startup Seed Fix for Empty Screens
+
+### What was found
+Screenshots showed the app shell and visual design were rendering correctly, but every data-backed screen was in an empty state:
+- Home: no started courses
+- Learn: no courses found
+- Goals: no daily quests and 0/0 progress
+- Me: 0 XP, 0 lessons, 0 trophies
+
+Codebase search showed the screens were wired to repository flows correctly:
+- `CourseCatalogViewModel` reads `repository.getCourses()`
+- `GoalsViewModel` reads `repository.getGoals()`
+- `TrophyRoomViewModel` reads `repository.getTrophies()`
+- `HomeDashboardViewModel` reads courses plus user progress
+
+That made the likely failure the Room seed path, not Compose rendering or filtering.
+
+### Search and docs used
+- Searched the codebase for `SampleDataSeeder`, `Room.databaseBuilder`, `addCallback`, `onCreate`, `onOpen`, and DAO insert paths.
+- Used Context7 for AndroidX/Room guidance around `RoomDatabase.Callback` and database prepopulation.
+- Used Android CLI docs:
+  - `android docs search "Room database callback prepopulate data onCreate DAO"`
+  - `android docs fetch kb://android/training/data-storage/room/prepopulate`
+  - `android docs search "Hilt inject Application onCreate Android"`
+  - `android docs fetch kb://android/training/dependency-injection/hilt-android`
+
+The docs helped confirm two implementation points:
+- Room's official prepopulate APIs are `createFromAsset()` / `createFromFile()` for packaged database files.
+- For this app's programmatic sample rows, seeding should happen after the Room instance is built/opened, through normal injected dependencies, rather than re-entering Room DAOs from the callback that is opening the same DB.
+- Hilt supports injecting application-level dependencies from `@HiltAndroidApp`, so startup seeding can live in `SkillArcadeApplication`.
+
+### Root cause
+`DatabaseModule` created a Room database and attached a callback that called `SampleDataSeeder(...).onCreate(db)`. That seeder then used Room DAOs from inside the Room open/create callback while Room was opening the same database instance. This can fail or race during database initialization and leave all tables empty, which matches the screenshots.
+
+### Fix implemented
+- Converted `SampleDataSeeder` from a `RoomDatabase.Callback` subclass into a `@Singleton` Hilt-injected class.
+- Added `seedIfNeeded()` that checks `courseDao.countCourses()` and seeds only when the course table is empty.
+- Wrapped all inserts in `db.withTransaction` so courses, lessons, goals, trophies, and user progress are created atomically.
+- Injected `SampleDataSeeder` into `SkillArcadeApplication` and launched `seedIfNeeded()` from `Application.onCreate()` on `Dispatchers.IO`.
+- Removed callback seeding and the captured `roomDb` variable from `DatabaseModule`.
+- Added DAO count queries for courses, lessons, goals, and trophies.
+- Updated `fallbackToDestructiveMigration()` to the non-deprecated `fallbackToDestructiveMigration(true)` overload.
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/SkillArcadeApplication.kt`
+- `app/src/main/java/com/example/skillarcade/di/DatabaseModule.kt`
+- `app/src/main/java/com/example/skillarcade/data/seed/SampleDataSeeder.kt`
+- `app/src/main/java/com/example/skillarcade/data/local/dao/CourseDao.kt`
+- `app/src/main/java/com/example/skillarcade/data/local/dao/LessonDao.kt`
+- `app/src/main/java/com/example/skillarcade/data/local/dao/GoalDao.kt`
+- `app/src/main/java/com/example/skillarcade/data/local/dao/TrophyDao.kt`
+- `app/src/androidTest/java/com/example/skillarcade/data/seed/SampleDataSeederTest.kt`
+
+### Code snippet
+```kotlin
+@Singleton
+class SampleDataSeeder @Inject constructor(
+    private val db: SkillArcadeDatabase,
+    private val courseDao: CourseDao,
+    private val lessonDao: LessonDao,
+    private val goalDao: GoalDao,
+    private val trophyDao: TrophyDao,
+    private val userProgressDao: UserProgressDao
+) {
+    suspend fun seedIfNeeded() {
+        db.withTransaction {
+            if (courseDao.countCourses() > 0) return@withTransaction
+            seedData()
+        }
+    }
+}
+```
+
+### Verification
+- TDD red step: `./gradlew assembleDebugAndroidTest --no-daemon` failed first because `seedIfNeeded()` and DAO count queries did not exist yet.
+- `./gradlew testDebugUnitTest --no-daemon` passed.
+- `./gradlew assembleDebugAndroidTest --no-daemon` passed.
+- `./gradlew assembleDebug --no-daemon` passed.
+- Device instrumentation execution was not run because `adb` was not on PATH and `android emulator list` returned no configured emulators.
+
+---
+
+## Task U — Resilient YouTube Lesson Player
+
+### What was found
+The Lesson Player already attempted to show YouTube content in a `WebView`, and `AndroidManifest.xml` already had `INTERNET`, so the blank white rectangle was not caused by a missing permission.
+
+The fragile parts were in `LessonPlayerScreen.kt`:
+- The WebView had no `WebViewClient`, so redirects, navigation, and load failures were not handled.
+- The WebView background was not forced to black, so failure or initial load appeared as an empty white rectangle.
+- There was no loading state, error state, or fallback action.
+- `extractVideoId()` only handled `youtube.com/watch?v=...`, not `youtu.be`, `/embed/`, or `/shorts/` links.
+
+### Search and docs used
+- Searched the codebase for `youtubeUrl`, `WebView`, `AndroidView`, `WebChromeClient`, `loadUrl`, and `INTERNET`.
+- Used Android CLI docs:
+  - `android docs search "Android WebView loadUrl WebViewClient JavaScript settings WebChromeClient"`
+  - `android docs fetch kb://android/develop/ui/views/layout/webapps/webview`
+- Used Context7 for AndroidX WebKit/WebView references around `WebViewClient` request handling.
+- Checked YouTube embed guidance for the `/embed/{videoId}` URL format and inline playback parameters.
+
+The docs confirmed the right direction: keep JavaScript enabled for YouTube, add a `WebViewClient` for navigation/error handling, keep `WebChromeClient`, and retain an external browser/app fallback for links the embedded player cannot handle reliably.
+
+### Fix implemented
+- Added `ui/video/YouTubeVideo.kt` with:
+  - `extractYouTubeVideoId()`
+  - `buildYouTubeEmbedUrl()`
+- Added JVM tests for watch, short, embed, shorts, invalid URLs, and embed URL generation.
+- Updated `YouTubePlayerCard` to:
+  - use `https://www.youtube.com/embed/{id}?playsinline=1&rel=0`
+  - force the WebView background to black
+  - enable JavaScript, DOM storage, wide viewport, and inline media playback
+  - attach a `WebViewClient`
+  - show `LOADING VIDEO...` while loading
+  - show `VIDEO UNAVAILABLE` plus `OPEN IN YOUTUBE` on invalid URLs or main-frame load failures
+  - send non-player external URLs to `Intent.ACTION_VIEW`
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/ui/screens/LessonPlayerScreen.kt`
+- `app/src/main/java/com/example/skillarcade/ui/video/YouTubeVideo.kt`
+- `app/src/test/java/com/example/skillarcade/ui/video/YouTubeVideoTest.kt`
+
+### Code snippet
+```kotlin
+val videoId = remember(lesson.youtubeUrl) { extractYouTubeVideoId(lesson.youtubeUrl) }
+val embedUrl = remember(videoId) { videoId?.let(::buildYouTubeEmbedUrl) }
+
+WebView(ctx).apply {
+    setBackgroundColor(android.graphics.Color.BLACK)
+    settings.javaScriptEnabled = true
+    settings.domStorageEnabled = true
+    settings.mediaPlaybackRequiresUserGesture = false
+    settings.loadWithOverviewMode = true
+    settings.useWideViewPort = true
+    webChromeClient = WebChromeClient()
+}
+```
+
+### Verification
+- TDD red step: `./gradlew testDebugUnitTest --no-daemon` failed first because `extractYouTubeVideoId()` and `buildYouTubeEmbedUrl()` did not exist yet.
+- `./gradlew testDebugUnitTest --no-daemon` passed after implementation.
+- `./gradlew assembleDebug --no-daemon` passed.
+
+### Next step
+Seeded lesson URLs were intentionally not expanded in this task. Next pass should replace the repeated sample YouTube URL with course-relevant YouTube links and expand the catalog to roughly 7-8 total courses.
+
+---
+
+## Task T — Profile Personalization (Me Screen)
+
+### What was implemented
+- **Personalized Profile**: Updated the "Me" screen (Trophy Room) to replace the generic "PLAYER" label with "ABDIRIZAK" in the profile header.
+- **Dynamic Avatar**: Integrated **Coil** for image loading and added a pixel-art profile photo generated via the **DiceBear API** with the seed "Abdirizak".
+- **Build Configuration**: Added `coil-compose` and `coil-network-okhttp` to `libs.versions.toml` and `app/build.gradle.kts` to support network image loading.
+
+### Why
+To improve the user experience by providing a personalized profile identity and a unique visual avatar, moving away from generic placeholders.
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/ui/screens/TrophyRoomScreen.kt`: Updated profile header and added `AsyncImage`.
+- `gradle/libs.versions.toml`: Added Coil version and library aliases.
+- `app/build.gradle.kts`: Added Coil dependencies.
+
+### Code snippet
+```kotlin
+AsyncImage(
+    model = "https://api.dicebear.com/7.x/pixel-art/png?seed=Abdirizak",
+    contentDescription = "Profile Photo",
+    modifier = Modifier
+        .fillMaxSize()
+        .padding(4.dp)
+        .clip(CircleShape),
+    contentScale = ContentScale.Crop
+)
+```
+
+### Verification
+- Ran `./gradlew assembleDebug` successfully.
+- Verified that the `AsyncImage` correctly points to the personalized DiceBear URL.
+
+---
+
+## Task V — Expanded Catalog with YouTube Video Cards
+
+### What was implemented
+- Expanded the seeded catalog from 3 courses to 8 courses.
+- Replaced repeated placeholder lesson video URLs with course-relevant public YouTube links.
+- Added YouTube thumbnail URLs to `Course.thumbnailUrl` using `https://img.youtube.com/vi/{videoId}/hqdefault.jpg`.
+- Updated Course Catalog cards to render real thumbnails with a dark overlay and play button, turning the previous abstract placeholder area into a video-card preview.
+- Bumped `SkillArcadeDatabase` from version 3 to 4 so existing installs destructively refresh into the new seed catalog.
+- Updated the seeder instrumentation test expectations from 3 courses / 44 lessons to 8 courses / 32 lessons.
+
+### Search and video sources used
+Web search was used to pick public, watchable YouTube videos and verify video IDs:
+- UI/UX design tutorial: `c9Wg6Cb_YlU`
+- Figma UI essentials: `kbZejnPXyLM`
+- JavaScript full course: `EerdGm-ehJQ`
+- React 19 app course: `dCLhUialKPQ`
+- Tailwind CSS v4 course: `6biMWgD6_JY`
+- Android beginners course: `fis26HvvDII`
+- React Native full stack app: `f8Z9JyB2EIE`
+- Digital marketing roadmap: `KZLroOQKT-g`
+
+Useful references found during search:
+- Class Central pages for freeCodeCamp UI/UX and Figma free video courses.
+- GitHub/SuperSimpleDev course repo linking the JavaScript course video.
+- Glasp summary pages for React, React Native, Tailwind, Android, and digital marketing videos.
+- Search snippets and mirrored references confirming exact YouTube video IDs for UI/UX, React, React Native, Kotlin/Android-related videos, and marketing courses.
+
+Context7 was used to confirm the library implementation details:
+- Coil docs (`/coil-kt/coil`) confirmed `coil3.compose.AsyncImage` supports URL models, `ContentScale.Crop`, and normal Compose modifiers for remote thumbnail rendering.
+- Android Developers docs (`/websites/developer_android_guide`) confirmed WebView needs JavaScript enabled for embedded web content and standard `loadUrl`/WebView configuration for remote pages.
+
+### Why
+The course list now had data, but the cards still looked visually empty because `CourseThumbnail` ignored `thumbnailUrl` and drew only a flat abstract placeholder. Using YouTube thumbnails makes each catalog item visibly connected to the video lesson experience and gives the Learn screen useful visual content.
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/data/seed/SampleDataSeeder.kt`
+- `app/src/main/java/com/example/skillarcade/data/local/SkillArcadeDatabase.kt`
+- `app/src/main/java/com/example/skillarcade/ui/screens/CourseCatalogScreen.kt`
+- `app/src/androidTest/java/com/example/skillarcade/data/seed/SampleDataSeederTest.kt`
+
+### Code snippet
+```kotlin
+private fun youtubeThumbnail(videoId: String): String =
+    "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
+
+AsyncImage(
+    model = course.thumbnailUrl,
+    contentDescription = "${course.title} video thumbnail",
+    contentScale = ContentScale.Crop,
+    modifier = Modifier.fillMaxSize()
+)
+```
+
+### Verification
+- `./gradlew testDebugUnitTest --no-daemon` passed.
+- `./gradlew assembleDebug assembleDebugAndroidTest --no-daemon` passed.
+- `android emulator list` returned no configured emulators, so no on-device visual run was available in this pass.
+
+---
+
+## Task W — Lesson Player Blank White WebView Fix
+
+### What was found
+The lesson screen correctly received a lesson and a YouTube URL, and the black WebView initially showed `LOADING VIDEO...`. After the WebView main page finished, the loader was hidden while the nested YouTube iframe had not actually reported readiness yet. On-device this appeared as a blank white video area.
+
+### Search and docs used
+- Web search found Google's YouTube IFrame Player API docs. The relevant guidance was to use an iframe URL with `enablejsapi=1`, include an `origin`, and listen for player events such as `onReady` and `onError`.
+- Context7 Android Developers docs confirmed the WebView setup path: JavaScript must be enabled for embedded web content, a `WebViewClient` should handle navigation/error behavior, and HTML can be loaded into a WebView instead of only loading a remote URL directly.
+
+### Fix implemented
+- Added `buildYouTubePlayerHtml(videoId)` in `YouTubeVideo.kt`.
+- The WebView now loads a controlled black HTML wrapper via `loadDataWithBaseURL(...)` instead of loading the raw YouTube embed URL directly.
+- Added `enablejsapi=1` and an encoded SkillArcade origin to the YouTube embed URL.
+- The HTML wrapper loads `https://www.youtube.com/iframe_api` and reports readiness through internal `skillarcade://player-ready` navigation.
+- The WebView no longer hides the loader on `onPageFinished`; it hides it only when the YouTube iframe reports `onReady`.
+- If YouTube reports `onError`, or if the iframe never reports ready within 10 seconds, the existing `OPEN IN YOUTUBE` fallback appears.
+- Added unit coverage for the generated black iframe wrapper and readiness/error hooks.
+
+### Key files changed
+- `app/src/main/java/com/example/skillarcade/ui/video/YouTubeVideo.kt`
+- `app/src/main/java/com/example/skillarcade/ui/screens/LessonPlayerScreen.kt`
+- `app/src/test/java/com/example/skillarcade/ui/video/YouTubeVideoTest.kt`
+
+### Code snippet
+```kotlin
+webView.loadDataWithBaseURL(
+    YOUTUBE_PLAYER_BASE_URL,
+    playerHtml,
+    "text/html",
+    "UTF-8",
+    null
+)
+```
+
+### Verification
+- `./gradlew testDebugUnitTest --no-daemon` passed.
+- `./gradlew assembleDebug --no-daemon` passed.
+- No fresh on-device screenshot pass was run in this turn. The Android CLI emulator check could not be rerun because the environment rejected that escalated command.

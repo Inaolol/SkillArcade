@@ -15,6 +15,9 @@ interface LessonDao {
     @Query("SELECT * FROM lessons WHERE id = :id")
     fun getById(id: String): Flow<LessonEntity?>
 
+    @Query("SELECT COUNT(*) FROM lessons")
+    suspend fun countLessons(): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(lessons: List<LessonEntity>)
 
