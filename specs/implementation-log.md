@@ -979,6 +979,34 @@ webView.loadDataWithBaseURL(
 
 ---
 
+## Task Y — Custom Splash Screen Image
+
+### What was implemented
+- Replaced the programmatic `SplashScreen` (gradient + text + emoji) with a custom full-screen image (`splash.png`).
+- Moved the user-provided `splash.png` from `res/` to `res/drawable/` for proper resource management.
+- Updated `SplashScreen.kt` to use `Image` with `painterResource` and `ContentScale.Crop`.
+
+### Why
+To match the specific visual branding requested by the user, replacing the foundation-slice placeholder with the final production asset.
+
+### Key files changed
+- `app/src/main/res/drawable/splash.png` (added/moved)
+- `app/src/main/java/com/example/skillarcade/ui/screens/SplashScreen.kt`
+
+### Code snippet
+```kotlin
+Image(
+    painter = painterResource(id = R.drawable.splash),
+    contentDescription = "SkillArcade Splash Screen",
+    modifier = Modifier.fillMaxSize(),
+    contentScale = ContentScale.Crop
+)
+```
+
+### Verification
+- Verified that `SplashScreen.kt` compiles and correctly references `R.drawable.splash`.
+- Checked that the 3-second delay and navigation to Onboarding are preserved.
+
 ## Task X — YouTube Player Playback Fix
 
 ### What was fixed
