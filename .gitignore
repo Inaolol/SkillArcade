@@ -13,3 +13,21 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Local documentation and agent context
+AGENTS.md
+CLAUDE.md
+.codex
+*.docx
+*.pdf
+~$*
+specs/
+skillarcade_design/
+
+# Keep only architecture docs visible in the repository
+docs/*
+!docs/architecture/
+!docs/architecture/**
+
+# Local IDE metadata
+.idea/

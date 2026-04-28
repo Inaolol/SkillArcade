@@ -1,8 +1,4 @@
 <p align="center">
-  <img src="skillarcade_design/skillarcade_ux_flowchart.png" width="400" alt="SkillArcade Logo" />
-</p>
-
-<p align="center">
   <b>SkillArcade: Gamify Your Growth</b><br>
   <i>Turning the educational grind into a high-score quest.</i>
 </p>
@@ -41,6 +37,13 @@ SkillArcade was born out of frustration with dry, uninspiring learning platforms
 The project follows a strict separation of concerns to ensure efficiency and maintainability.
 
 ![SkillArcade System Architecture](docs/architecture/skillarcade-system-architecture.png)
+
+Additional architecture diagrams are stored in `docs/architecture/`:
+
+* [User Journey / App Flow](docs/architecture/skillarcade-user-journey-app-flow.png)
+* [MVVM Data Flow](docs/architecture/skillarcade-mvvm-data-flow.png)
+* [Lesson Completion Sequence](docs/architecture/skillarcade-lesson-completion-sequence.png)
+* [Implementation Log](docs/architecture/implementation-log.md)
 
 ## 🚀 Setup Instructions
 Follow these steps to deploy the arcade environment to your local machine:
