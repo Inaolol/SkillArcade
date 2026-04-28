@@ -14,7 +14,7 @@
 .cxx
 local.properties
 
-# Local documentation and agent context
+# Local documentation
 AGENTS.md
 CLAUDE.md
 .codex
@@ -24,7 +24,7 @@ CLAUDE.md
 specs/
 skillarcade_design/
 
-# Keep only architecture docs visible in the repository
+
 docs/*
 !docs/architecture/
 !docs/architecture/**
