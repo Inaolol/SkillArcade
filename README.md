@@ -43,7 +43,6 @@ Additional architecture diagrams are stored in `docs/architecture/`:
 * [User Journey / App Flow](docs/architecture/skillarcade-user-journey-app-flow.png)
 * [MVVM Data Flow](docs/architecture/skillarcade-mvvm-data-flow.png)
 * [Lesson Completion Sequence](docs/architecture/skillarcade-lesson-completion-sequence.png)
-* [Implementation Log](docs/architecture/implementation-log.md)
 
 ## 🚀 Setup Instructions
 Follow these steps to deploy the arcade environment to your local machine:
