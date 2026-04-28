@@ -1,5 +1,240 @@
 # SkillArcade Implementation Log
 
+## 2026-04-28 - Report v2 Code Detail Expansion
+
+### What Was Implemented
+- Created `SkillArcade_Project_Report_Rewritten_First_Person_v2.docx`.
+- Added more Kotlin code snippets and explanations to the first-person report.
+- Expanded progress calculation, goal evaluation, YouTube integration, Android intent fallback, WebView settings, testing, and practical debugging sections.
+
+### Why This Was Implemented
+- The report needed more practical code discussion, especially in Testing, Debugging, Verification, and Difficulties/Solutions.
+
+### Problem It Solves
+- Makes the report show more direct understanding of the implementation instead of only describing features in prose.
+
+### Files Changed
+- `SkillArcade_Project_Report_Rewritten_First_Person_v2.docx`
+- `specs/implementation-log.md`
+
+### Important Code Snippet
+```kotlin
+private fun openExternalUrl(context: Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    runCatching { context.startActivity(intent) }
+}
+```
+
+### UI/UX Decision
+- Kept code blocks inside the chapters where the feature is discussed, so code and screenshot explanations stay connected.
+
+### Screenshot To Capture
+- Report pages showing the expanded YouTube integration, testing, and practical fix code blocks.
+
+### Before State
+- The rewritten report had a strong first-person structure but needed more code snippets and practical implementation explanation.
+
+### After State
+- The v2 report has 4414 words, 200 paragraphs, 14 embedded images/shapes, and expanded code-focused explanations.
+
+### Challenge Faced
+- The new content needed to add technical depth without returning to a disconnected appendix style.
+
+### Solution
+- Inserted additional code and explanation into the relevant existing chapters: development, YouTube player, testing, and difficulties.
+
+### Report Notes
+- Verification confirmed the new sections are present and the earlier meta phrases about teacher feedback are absent.
+
+## 2026-04-28 - First-Person Report Rewrite
+
+### What Was Implemented
+- Created `SkillArcade_Project_Report_Rewritten_First_Person.docx` as a clean rewrite of the project report.
+- Reorganized the report into connected chapters: Introduction, Technology and System Overview, Planning Stage, Development Stage, Testing, Final Version, Difficulties and Solutions, Rubric Coverage, and GitHub Information.
+- Removed meta-language about responding to feedback and rewrote the report as a first-person explanation of how the app was built.
+- Integrated diagrams, screenshots, code snippets, development cycles, challenges, fixes, and verification notes into the relevant chapters.
+
+### Why This Was Implemented
+- The previous report had useful content but some sections sounded like an external explanation instead of a personal project report.
+
+### Problem It Solves
+- Makes the report read as the student's own development story and connects each code block, screenshot, diagram, and difficulty to the app feature it belongs to.
+
+### Files Changed
+- `SkillArcade_Project_Report_Rewritten_First_Person.docx`
+- `specs/implementation-log.md`
+
+### Important Code Snippet
+```kotlin
+override suspend fun completeLesson(lessonId: String) {
+    val lesson = lessonDao.getById(lessonId).first() ?: return
+    if (lesson.isCompleted) return
+    db.withTransaction { /* update lesson, course, XP, goals, trophies */ }
+}
+```
+
+### UI/UX Decision
+- Kept screenshots and diagrams close to the chapter where they are discussed, instead of placing all visuals in disconnected sections.
+
+### Screenshot To Capture
+- Final rewritten report pages showing the development chapter, code discussions, diagrams, and rubric table.
+
+### Before State
+- The report had addendum-style sections and some wording that sounded like it was written about the report rather than by the project author.
+
+### After State
+- The report is a single first-person narrative with 3252 words, 14 embedded images/shapes, one rubric table, and no teacher-feedback meta phrasing.
+
+### Challenge Faced
+- The report needed to preserve the useful diagrams/code evidence while changing the structure and voice substantially.
+
+### Solution
+- Rebuilt the report as a fresh DOCX using the implementation log, codebase snippets, screenshots, and architecture diagrams as source material.
+
+### Report Notes
+- Verification confirmed required chapter headings are present and the phrases "This section responds directly to the teacher feedback" and "I wrote it to explain the code blocks" are absent. Visual render is still blocked locally because `soffice` and `pdftoppm` are not installed.
+
+## 2026-04-28 - Rubric-Ready Report Revision
+
+### What Was Implemented
+- Created `SkillArcade_Project_Report_Final_Rubric_Ready.docx` from the enhanced technical report.
+- Added a personal code discussion section explaining navigation, ViewModel StateFlow, sample data seeding, and lesson completion code blocks.
+- Added a rubric coverage checklist table mapped to the assignment criteria.
+- Updated the GitHub information section with the repository username and URL.
+
+### Why This Was Implemented
+- The teacher requested detailed discussion of code blocks, personal explanation of how the project was built, encountered difficulties, solutions, and coverage of the rubric.
+
+### Problem It Solves
+- Makes the report read like individual technical reflection rather than only a project summary, and makes rubric coverage explicit for grading.
+
+### Files Changed
+- `SkillArcade_Project_Report_Final_Rubric_Ready.docx`
+- `specs/implementation-log.md`
+
+### Important Code Snippet
+```kotlin
+val uiState: StateFlow<HomeDashboardUiState> = combine(
+    repository.getCourses(),
+    repository.getUserProgress()
+) { courses, userProgress -> ... }
+```
+
+### UI/UX Decision
+- Kept the diagrams and tables in the report because they make the technical flow easier to understand in printed form.
+
+### Screenshot To Capture
+- Final report pages showing the personal code discussion and rubric checklist.
+
+### Before State
+- The enhanced report had diagrams and technical guidance, but it did not strongly discuss the code blocks in first-person detail.
+
+### After State
+- The final report includes detailed personal discussion, challenges and solutions, code explanations, explicit rubric coverage, and GitHub details.
+
+### Challenge Faced
+- The report needed to satisfy both the 1000+ word requirement and the teacher's request for personal understanding, without removing the existing screenshots and diagrams.
+
+### Solution
+- Added a dedicated Section 11 with personal implementation narrative, code-block explanations, difficulty discussion, and rubric checklist.
+
+### Report Notes
+- Verification found 4061 words, 195 paragraphs, 2 tables, 12 embedded images/shapes, and all required new sections present.
+
+## 2026-04-28 - Technical Report Diagram Addendum
+
+### What Was Implemented
+- Saved the generated user journey, MVVM data flow, and lesson completion sequence diagrams into `docs/architecture/`.
+- Created an enhanced DOCX report copy with a technical documentation addendum.
+- Added architecture diagrams, app-flow explanations, a "where to edit" maintenance table, and focused code snippets.
+
+### Why This Was Implemented
+- The report needed stronger technical documentation so readers can understand how the app works and where future changes should be made.
+
+### Problem It Solves
+- Makes the report easier to follow for teachers, reviewers, and future developers by combining visuals, code paths, and file-level guidance.
+
+### Files Changed
+- `docs/architecture/skillarcade-user-journey-app-flow.png`
+- `docs/architecture/skillarcade-mvvm-data-flow.png`
+- `docs/architecture/skillarcade-lesson-completion-sequence.png`
+- `SkillArcade_Project_Report_Technical_Documentation.docx`
+- `specs/implementation-log.md`
+
+### Important Code Snippet
+```kotlin
+db.withTransaction {
+    lessonDao.markCompleted(lessonId)
+    courseDao.incrementCompleted(lesson.courseId)
+    userProgressDao.incrementLessonsCompleted(UserProgress.SINGLE_USER_ID)
+    addXp(lesson.xpReward)
+}
+```
+
+### UI/UX Decision
+- Used full-width report diagrams with captions so the document reads like technical documentation, not just a written summary.
+
+### Screenshot To Capture
+- DOCX pages showing the four technical diagrams and the maintenance table.
+
+### Before State
+- The report had strong project narrative and screen descriptions but lacked the generated technical diagrams and developer maintenance map.
+
+### After State
+- A new enhanced report copy includes architecture, app flow, MVVM data flow, lesson completion sequence, edit-location table, and code excerpts.
+
+### Challenge Faced
+- The original DOCX could not be overwritten because Windows returned a permission error, likely because the file was open in another app.
+
+### Solution
+- Saved the enhanced document as `SkillArcade_Project_Report_Technical_Documentation.docx` while leaving the original report unchanged.
+
+### Report Notes
+- The new addendum explains the layered architecture, user flow, reactive StateFlow path, local Room persistence, lesson completion transaction, and the exact files to edit for common future changes.
+
+## 2026-04-28 - README Architecture Diagram
+
+### What Was Implemented
+- Saved the generated draw.io-style system architecture diagram into the project documentation assets.
+- Replaced the README architecture ASCII diagram with a Markdown image reference.
+
+### Why This Was Implemented
+- The architecture section now shows the full SkillArcade app structure visually instead of a simplified text-only layer stack.
+
+### Problem It Solves
+- Makes the README architecture section easier to understand for reviewers, teachers, and future contributors.
+
+### Files Changed
+- `README.md`
+- `docs/architecture/skillarcade-system-architecture.png`
+- `specs/implementation-log.md`
+
+### Important Code Snippet
+```markdown
+![SkillArcade System Architecture](docs/architecture/skillarcade-system-architecture.png)
+```
+
+### UI/UX Decision
+- Used a stable project-relative image path so the README renders on GitHub and from local project clones.
+
+### Screenshot To Capture
+- README architecture section showing the diagram.
+
+### Before State
+- README contained a simplified ASCII architecture diagram.
+
+### After State
+- README references a project-local PNG architecture diagram.
+
+### Challenge Faced
+- The generated image originally lived in the Codex generated-images cache path, which is not suitable for repository documentation.
+
+### Solution
+- Copied the PNG into `docs/architecture/` and referenced it from README with a relative path.
+
+### Report Notes
+- The architecture diagram documents the Android app shell, Compose presentation layer, domain use cases/models, repository boundary, Room data layer, Hilt injection links, and local Room SQLite persistence.
+
 ## 2026-04-28 - Foundation Slice
 
 ### What Was Implemented

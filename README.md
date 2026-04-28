@@ -40,24 +40,7 @@ SkillArcade was born out of frustration with dry, uninspiring learning platforms
 ## 📐 Document Structure & Architecture
 The project follows a strict separation of concerns to ensure efficiency and maintainability.
 
-```text
-+---------------------------------------+
-|              UI Layer                 |
-| (Compose Screens, ViewModels, Theme)  |
-+-------------------+-------------------+
-                    |
-                    v
-+-------------------+-------------------+
-|            Domain Layer               |
-|  (Models, UseCases, Repositories)     |
-+-------------------+-------------------+
-                    |
-                    v
-+-------------------+-------------------+
-|              Data Layer               |
-| (Room DB, DAOs, Repository Impl)      |
-+---------------------------------------+
-```
+![SkillArcade System Architecture](docs/architecture/skillarcade-system-architecture.png)
 
 ## 🚀 Setup Instructions
 Follow these steps to deploy the arcade environment to your local machine:
