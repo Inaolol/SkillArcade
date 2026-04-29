@@ -1,6 +1,10 @@
 <p align="center">
-  <b>SkillArcade: Gamify Your Growth</b><br>
-  <i>Turning the educational grind into a high-score quest.</i>
+  <img
+    src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&size=26&duration=2800&pause=800&color=A855F7&center=true&vCenter=true&width=800&lines=SkillArcade%3A+Gamify+Your+Growth;Quests%2C+XP%2C+and+Trophies"
+    />
+  <br/>
+  <b>SkillArcade</b><br>
+  <i>Gamify Your Growth.</i>
 </p>
 
 <p align="center">
@@ -43,7 +47,20 @@ Additional architecture diagrams are stored in `docs/architecture/`:
 * [User Journey / App Flow](docs/architecture/skillarcade-user-journey-app-flow.png)
 * [MVVM Data Flow](docs/architecture/skillarcade-mvvm-data-flow.png)
 * [Lesson Completion Sequence](docs/architecture/skillarcade-lesson-completion-sequence.png)
-* [Implementation Log](docs/architecture/implementation-log.md)
+
+## 📸 App Screenshots
+
+| Splash | Home | Courses |
+| :---: | :---: | :---: |
+| ![Splash screen](docs/screenshots/Screenshot_splash_SkillArcade.jpg) | ![Home dashboard](docs/screenshots/Screenshot_home_SkillArcade.jpg) | ![Courses screen](docs/screenshots/Screenshot_courses_SkillArcade.jpg) |
+
+| Course Catalog | Lesson Player | Trophies |
+| :---: | :---: | :---: |
+| ![Course catalog](docs/screenshots/Screenshot_courseCatalog_SkillArcade.jpg) | ![Lesson player](docs/screenshots/Screenshot_lessonPlayer_SkillArcade.jpg) | ![Trophy room](docs/screenshots/Screenshot_trophies_SkillArcade.jpg) |
+
+| Profile |
+| :---: |
+| ![Profile screen](docs/screenshots/Screenshot_me_SkillArcade.jpg) |
 
 ## 🚀 Setup Instructions
 Follow these steps to deploy the arcade environment to your local machine:
