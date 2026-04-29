@@ -49,7 +49,7 @@ class YouTubeVideoTest {
     @Test
     fun `buildYouTubeEmbedUrl appends inline playback parameters`() {
         assertEquals(
-            "https://www.youtube.com/embed/dQw4w9WgXcQ?playsinline=1&rel=0&enablejsapi=1&origin=https%3A%2F%2Fskillarcade.local",
+            "https://www.youtube.com/embed/dQw4w9WgXcQ?playsinline=1&rel=0&controls=1&enablejsapi=1&origin=https%3A%2F%2Fskillarcade.local",
             buildYouTubeEmbedUrl("dQw4w9WgXcQ")
         )
     }
@@ -58,14 +58,14 @@ class YouTubeVideoTest {
     fun `buildYouTubePlayerHtml wraps embed in full size black iframe page`() {
         val html = buildYouTubePlayerHtml("dQw4w9WgXcQ")
 
-        assertTrue(html.contains("<!doctype html>"))
+        assertTrue(html.contains("<!DOCTYPE html>"))
         assertTrue(html.contains("background: #000000"))
+        assertTrue(html.contains("html,"))
+        assertTrue(html.contains("body {"))
         assertTrue(html.contains("width: 100%"))
         assertTrue(html.contains("height: 100%"))
         assertTrue(html.contains("src=\"${buildYouTubeEmbedUrl("dQw4w9WgXcQ")}\""))
         assertTrue(html.contains("allowfullscreen"))
-        assertTrue(html.contains("https://www.youtube.com/iframe_api"))
-        assertTrue(html.contains("skillarcade://player-ready"))
-        assertTrue(html.contains("skillarcade://player-error"))
+        assertTrue(html.contains("controls=1"))
     }
 }

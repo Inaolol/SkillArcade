@@ -42,6 +42,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.skillarcade.domain.model.Lesson
 import com.example.skillarcade.ui.components.ArcadeButton
+import com.example.skillarcade.ui.components.ArcadeButtonVariant
 import com.example.skillarcade.ui.components.ArcadeChip
 import com.example.skillarcade.ui.theme.ArcadeColors
 import com.example.skillarcade.ui.theme.ArcadeTokens
@@ -102,8 +103,9 @@ private fun YouTubePlayerCard(lesson: Lesson) {
     val playerHtml = remember(videoId) { videoId?.let(::buildYouTubePlayerHtml) }
     var isLoading by remember(playerHtml) { mutableStateOf(playerHtml != null) }
     var hasError by remember(playerHtml) { mutableStateOf(playerHtml == null) }
+    var playerResetKey by remember(playerHtml) { mutableStateOf(0) }
 
-    LaunchedEffect(playerHtml) {
+    LaunchedEffect(playerHtml, playerResetKey) {
         if (playerHtml != null) {
             delay(10_000)
             if (isLoading && !hasError) {
@@ -113,106 +115,127 @@ private fun YouTubePlayerCard(lesson: Lesson) {
         }
     }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .aspectRatio(16f / 9f)
-            .arcadeBorderShadow(
-                cornerRadius = ArcadeTokens.CornerRadius,
-                backgroundColor = ArcadeColors.InkBlack
-            )
+            .padding(horizontal = 20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(ArcadeTokens.CornerRadius))
-                .background(ArcadeColors.InkBlack)
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .arcadeBorderShadow(
+                    cornerRadius = ArcadeTokens.CornerRadius,
+                    backgroundColor = ArcadeColors.InkBlack
+                )
         ) {
-            if (playerHtml != null) {
-                AndroidView(
-                    factory = { ctx ->
-                        WebView(ctx).apply {
-                            setBackgroundColor(android.graphics.Color.BLACK)
-                            settings.javaScriptEnabled = true
-                            settings.domStorageEnabled = true
-                            settings.mediaPlaybackRequiresUserGesture = false
-                            settings.loadsImagesAutomatically = true
-                            settings.userAgentString = "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
-                            webChromeClient = WebChromeClient()
-                        }
-                    },
-                    update = { webView ->
-                        webView.webViewClient = object : WebViewClient() {
-                            override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
-                                isLoading = true
-                                hasError = false
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(ArcadeTokens.CornerRadius))
+                    .background(ArcadeColors.InkBlack)
+            ) {
+                if (playerHtml != null) {
+                    AndroidView(
+                        factory = { ctx ->
+                            WebView(ctx).apply {
+                                setBackgroundColor(android.graphics.Color.BLACK)
+                                settings.javaScriptEnabled = true
+                                settings.domStorageEnabled = true
+                                settings.mediaPlaybackRequiresUserGesture = false
+                                settings.loadsImagesAutomatically = true
+                                settings.userAgentString = "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+                                webChromeClient = WebChromeClient()
                             }
-
-                            override fun onPageFinished(view: WebView?, url: String?) {
-                                isLoading = false
-                            }
-
-                            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-                                if (request?.isForMainFrame != false) {
-                                    isLoading = false
-                                    hasError = true
+                        },
+                        update = { webView ->
+                            webView.webViewClient = object : WebViewClient() {
+                                override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                                    isLoading = true
+                                    hasError = false
                                 }
-                            }
 
-                            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                                val url = request?.url ?: return false
-                                
-                                if (request?.isForMainFrame == true) {
-                                    val host = url.host.orEmpty()
-                                    val canStay = host.endsWith("youtube.com") || 
-                                                 host.endsWith("youtube-nocookie.com") ||
-                                                 host.endsWith("gstatic.com") ||
-                                                 host.endsWith("googlevideo.com")
-                                    
-                                    if (!canStay) {
-                                        openExternalUrl(context, url.toString())
-                                        return true
+                                override fun onPageFinished(view: WebView?, url: String?) {
+                                    isLoading = false
+                                }
+
+                                override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                                    if (request?.isForMainFrame != false) {
+                                        isLoading = false
+                                        hasError = true
                                     }
                                 }
-                                return false
+
+                                override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                                    val url = request?.url ?: return false
+
+                                    if (request?.isForMainFrame == true) {
+                                        val host = url.host.orEmpty()
+                                        val canStay = host.endsWith("youtube.com") ||
+                                            host.endsWith("youtube-nocookie.com") ||
+                                            host.endsWith("gstatic.com") ||
+                                            host.endsWith("googlevideo.com")
+
+                                        if (!canStay) {
+                                            openExternalUrl(context, url.toString())
+                                            return true
+                                        }
+                                    }
+                                    return false
+                                }
                             }
-                        }
 
-                        if (webView.tag != playerHtml) {
-                            webView.tag = playerHtml
-                            webView.loadDataWithBaseURL(YOUTUBE_PLAYER_BASE_URL, playerHtml!!, "text/html", "UTF-8", null)
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
+                            val playerState = playerHtml to playerResetKey
+                            if (webView.tag != playerState) {
+                                webView.tag = playerState
+                                webView.stopLoading()
+                                webView.loadDataWithBaseURL(YOUTUBE_PLAYER_BASE_URL, playerHtml!!, "text/html", "UTF-8", null)
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+
+                if (isLoading) {
+                    Text(
+                        text = "LOADING VIDEO...",
+                        modifier = Modifier.align(Alignment.Center),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Color.White,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                if (hasError) {
+                    VideoFallback(
+                        onOpenExternal = { openExternalUrl(context, lesson.youtubeUrl) },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
             }
 
-            if (isLoading) {
-                Text(
-                    text = "LOADING VIDEO...",
-                    modifier = Modifier.align(Alignment.Center),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            if (hasError) {
-                VideoFallback(
-                    onOpenExternal = { openExternalUrl(context, lesson.youtubeUrl) },
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
+            ArcadeChip(
+                text = "${lesson.durationMinutes} min",
+                color = ArcadeColors.PrimaryYellow,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
+            )
         }
 
-        ArcadeChip(
-            text = "${lesson.durationMinutes} min",
-            color = ArcadeColors.PrimaryYellow,
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(8.dp)
-        )
+        if (playerHtml != null) {
+            ArcadeButton(
+                text = "STOP VIDEO",
+                onClick = {
+                    isLoading = true
+                    hasError = false
+                    playerResetKey += 1
+                },
+                modifier = Modifier.fillMaxWidth(),
+                variant = ArcadeButtonVariant.Destructive
+            )
+        }
     }
 }
 

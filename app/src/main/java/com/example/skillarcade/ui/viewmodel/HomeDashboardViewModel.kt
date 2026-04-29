@@ -15,6 +15,7 @@ import javax.inject.Inject
 data class HomeDashboardUiState(
     val userProgress: UserProgress? = null,
     val inProgressCourses: List<Course> = emptyList(),
+    val recommendedCourses: List<Course> = emptyList(),
     val isLoading: Boolean = false
 )
 
@@ -27,16 +28,30 @@ class HomeDashboardViewModel @Inject constructor(
         repository.getCourses(),
         repository.getUserProgress()
     ) { courses, userProgress ->
-        HomeDashboardUiState(
-            userProgress = userProgress,
-            inProgressCourses = courses
-                .filter { it.completedLessons > 0 && it.completedLessons < it.totalLessons }
-                .take(3),
-            isLoading = false
-        )
+        buildHomeDashboardUiState(courses, userProgress)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = HomeDashboardUiState(isLoading = true)
+    )
+}
+
+internal fun buildHomeDashboardUiState(
+    courses: List<Course>,
+    userProgress: UserProgress
+): HomeDashboardUiState {
+    val allInProgressCourses = courses
+        .filter { it.completedLessons > 0 && it.completedLessons < it.totalLessons }
+    val inProgressCourses = allInProgressCourses
+        .take(3)
+    val inProgressIds = allInProgressCourses.mapTo(mutableSetOf()) { it.id }
+
+    return HomeDashboardUiState(
+        userProgress = userProgress,
+        inProgressCourses = inProgressCourses,
+        recommendedCourses = courses
+            .filterNot { it.id in inProgressIds }
+            .take(4),
+        isLoading = false
     )
 }

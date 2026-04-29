@@ -26,14 +26,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.example.skillarcade.domain.model.Course
 import com.example.skillarcade.domain.model.Difficulty
-import com.example.skillarcade.domain.model.UserProgress
 import com.example.skillarcade.ui.components.ArcadeButton
 import com.example.skillarcade.ui.components.ArcadeChip
 import com.example.skillarcade.ui.components.ArcadeProgressBar
@@ -46,6 +47,9 @@ fun HomeDashboardScreen(onOpenCourse: (String) -> Unit) {
     val vm: HomeDashboardViewModel = hiltViewModel()
     val uiState by vm.uiState.collectAsStateWithLifecycle()
     var selectedCategory by remember { mutableStateOf("ALL") }
+    val visibleCourses = remember(uiState.recommendedCourses, selectedCategory) {
+        uiState.recommendedCourses.filterByDashboardCategory(selectedCategory)
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -58,38 +62,38 @@ fun HomeDashboardScreen(onOpenCourse: (String) -> Unit) {
         item {
             WelcomeSection()
         }
-        if (uiState.inProgressCourses.isEmpty()) {
-            item {
-                CategoryChipsRow(selected = selectedCategory, onSelect = { selectedCategory = it })
-            }
-            item {
-                SectionHeading("CONTINUE LEARNING")
-            }
-            item {
-                EmptyCoursesCard()
-            }
-        } else {
+        if (uiState.inProgressCourses.isNotEmpty()) {
             item {
                 HeroCard(
                     course = uiState.inProgressCourses.first(),
                     onResume = { onOpenCourse(uiState.inProgressCourses.first().id) }
                 )
             }
+        }
+        item {
+            CategoryChipsRow(selected = selectedCategory, onSelect = { selectedCategory = it })
+        }
+        item {
+            SectionHeading("COURSES")
+        }
+        if (visibleCourses.isEmpty()) {
             item {
-                CategoryChipsRow(selected = selectedCategory, onSelect = { selectedCategory = it })
+                EmptyCoursesCard(selectedCategory = selectedCategory)
             }
-            val remaining = uiState.inProgressCourses.drop(1)
-            if (remaining.isNotEmpty()) {
-                item {
-                    SectionHeading("CONTINUE LEARNING")
-                }
-                items(remaining, key = { it.id }) { course ->
-                    CourseProgressCard(course = course, onClick = { onOpenCourse(course.id) })
-                }
+        } else {
+            items(visibleCourses, key = { it.id }) { course ->
+                CourseProgressCard(course = course, onClick = { onOpenCourse(course.id) })
             }
         }
     }
 }
+
+private fun List<Course>.filterByDashboardCategory(category: String): List<Course> =
+    when (category) {
+        "POPULAR" -> filter { it.tag.equals("POPULAR", ignoreCase = true) }
+        "NEWEST" -> filter { it.tag.equals("NEW", ignoreCase = true) }
+        else -> this
+    }
 
 @Composable
 private fun DashboardHeader(streak: Int) {
@@ -242,6 +246,19 @@ private fun CourseProgressCard(course: Course, onClick: () -> Unit) {
                     .aspectRatio(16f / 9f)
                     .arcadeBorderShadow(cornerRadius = 8.dp, backgroundColor = thumbnailColor)
             ) {
+                if (course.thumbnailUrl.isNotBlank()) {
+                    AsyncImage(
+                        model = course.thumbnailUrl,
+                        contentDescription = "${course.title} course thumbnail",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.22f))
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
@@ -254,7 +271,11 @@ private fun CourseProgressCard(course: Course, onClick: () -> Unit) {
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "${(progress * 100).toInt()}%",
+                        text = if (course.completedLessons > 0) {
+                            "${(progress * 100).toInt()}%"
+                        } else {
+                            course.tag ?: "START"
+                        },
                         style = MaterialTheme.typography.labelLarge,
                         color = ArcadeColors.InkBlack
                     )
@@ -275,13 +296,21 @@ private fun CourseProgressCard(course: Course, onClick: () -> Unit) {
                 )
                 ArcadeChip(text = course.difficulty.name, color = difficultyChipColor)
             }
-            ArcadeProgressBar(progress = progress)
+            if (course.completedLessons > 0) {
+                ArcadeProgressBar(progress = progress)
+            } else {
+                ArcadeButton(
+                    text = "START →",
+                    onClick = onClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun EmptyCoursesCard() {
+private fun EmptyCoursesCard(selectedCategory: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,13 +327,13 @@ private fun EmptyCoursesCard() {
                 style = MaterialTheme.typography.displayLarge
             )
             Text(
-                text = "NO COURSES STARTED YET",
+                text = "NO $selectedCategory COURSES",
                 style = MaterialTheme.typography.headlineMedium,
                 color = ArcadeColors.InkBlack,
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "Browse the Courses tab to begin your arcade journey!",
+                text = "Try another filter or open Learn to browse the full catalog.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

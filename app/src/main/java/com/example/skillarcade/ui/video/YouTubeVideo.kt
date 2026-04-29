@@ -26,16 +26,37 @@ fun extractYouTubeVideoId(youtubeUrl: String): String? {
 }
 
 fun buildYouTubeEmbedUrl(videoId: String): String =
-    "https://www.youtube.com/embed/$videoId?playsinline=1&rel=0&enablejsapi=1&origin=$YOUTUBE_PLAYER_ORIGIN_QUERY&widgetid=1"
+    "https://www.youtube.com/embed/$videoId?playsinline=1&rel=0&controls=1&enablejsapi=1&origin=$YOUTUBE_PLAYER_ORIGIN_QUERY"
 
 fun buildYouTubePlayerHtml(videoId: String): String {
     return """
         <!DOCTYPE html>
         <html>
-        <body style="margin:0;padding:0;background:#000;">
-            <iframe width="100%" height="100%" 
-                src="https://www.youtube.com/embed/$videoId?playsinline=1&controls=1" 
-                frameborder="0" 
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                html,
+                body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    overflow: hidden;
+                    background: #000000;
+                }
+
+                iframe {
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                    border: 0;
+                    background: #000000;
+                }
+            </style>
+        </head>
+        <body>
+            <iframe
+                src="${buildYouTubeEmbedUrl(videoId)}"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                 allowfullscreen>
             </iframe>
